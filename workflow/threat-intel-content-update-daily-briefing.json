@@ -1,0 +1,2403 @@
+{
+  "name": "Threat Intel Automation (Content Update & Daily Briefing)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Summarization and Dissemination (Daily Briefing Workflow)\n",
+        "height": 520,
+        "width": 3000,
+        "color": 6
+      },
+      "id": "3730ce49-cb85-4a2d-9944-5ad9ebe79d17",
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        20
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9,
+              "triggerAtMinute": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -600,
+        320
+      ],
+      "id": "db6f89c6-bdab-4989-8028-7868db086aef",
+      "name": "Schedule Trigger1",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "operation": "subtractFromDate",
+        "magnitude": "={{ $('Schedule Trigger1').item.json.timestamp }}",
+        "duration": 1,
+        "outputFieldName": "Yesterday_Date",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        320
+      ],
+      "id": "d0d05291-e2ff-4158-9ad5-ae17d29c46e4",
+      "name": "Date & Time1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseFormat": "text"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        400
+      ],
+      "id": "632c43c6-6d07-4b8e-a99c-02acb2253f97",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Dates selection\n",
+        "height": 300,
+        "width": 360,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        240
+      ],
+      "id": "44c9e096-6c16-4d96-9f1d-ed6a0148144c",
+      "name": "Sticky Note33"
+    },
+    {
+      "parameters": {
+        "content": "## Merging and Filtering",
+        "height": 480,
+        "width": 660,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        780,
+        220
+      ],
+      "id": "68557962-4d1c-4ecb-85da-dc68a9903de0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "numberInputs": 9
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        840,
+        280
+      ],
+      "id": "94d3e2ab-86cd-467c-977b-7caf1c8122df",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Present the final response with below information:\nTitle: {{ $json.title }}\nSummary: read the article content {{ $json.content }} and summarize it in a paragraphs of 120 words total. Make sure to include the details of the threat actor(if present), details on the vulnerability (if present), CVE ID (if present), CVSS score (if present) and methodology (if present) and tools used (if present). Threat Dynamics: Most importantly, check to see if a vulnerability has been exploited in the wild as per the article.\nRemediation: Provide for any remediations, patches or techniques mentioned in order to stay safe from the attack. Summarise the same in 60 words or less. Add inference from your own in cases of mentions of OWASP Top 10 vulnerabilities, if no OWASP Top 10 vulnerability is mentioned in the article then don't add any statements to the summary. Also DO NOT add this line \"The article does not mention specific remediation techniques or patches\"\nReference:\n{{ $json.link }}",
+        "options": {
+          "systemMessage": "=# Formatting Instructions:\nCreate a Markdown (.md) file with the following requirements:\nUse clear section headings with #, ##, and ### as appropriate.\nFor labels like \"Summary\", \"Threat Dynamics\", \"Remediation\", and \"Reference\", use bold formatting followed by a colon.\nEnsure that the text under each label is indented with a full-width tab (or at least 4 spaces) for visual clarity and to distinguish it from the labels.\nInsert horizontal rules (---) between major sections for separation.\nPreserve any visual formatting or layout that helps differentiate between sections (e.g., example entries, bullet structure, URL links).\nDo not convert tabs into flat text—maintain indentation explicitly using spaces or Markdown-friendly indentation styles.\nThe goal is to make the .md file look as close as possible to a professional briefing document with a clear visual hierarchy.\nStrict: Do not use \"&emsp;'\nDo not add \"```markdown\" in the output.\nDo not provide Reference links as hyperlinks, just provide the Reference link as it is."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1560,
+        260
+      ],
+      "id": "0b0a4123-c48d-42d8-a440-f88ed2e829b0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "## Summarization and Dissemination (Content Update Workflow)\n",
+        "height": 520,
+        "width": 3000,
+        "color": 6
+      },
+      "id": "4e677055-0891-4c3b-85e7-5c6af0ee2ce2",
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        560
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseFormat": "text"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        960
+      ],
+      "id": "09a76d5b-14b3-4a6b-9eab-6db01e7a7505",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Read the article content {{ $json.content }} and store this information. Basis of the store information, provide the output in below format:\nTitle: {{ $json.title }}\nSummary: Write a Summary, maximum in 120 words, ensuring to mention the name of campaign actor.\nModus Operandi: Write about the vulnerability that is being exploited, focus on the specific case scenarios which can be detected by a SIEM without mentioning the term \"SIEM\".\nMitigations: Extract any mitigations mentioned in the article, keep this under 75 words.\nReference: \n{{ $json.link }}\nEnsure to focus on those detection only which have a highest signal-to-noise ratio.",
+        "options": {
+          "systemMessage": "=# Formatting Instructions:\nCreate a Markdown (.md) file with the following requirements:\nUse clear section headings with #, ##, and ### as appropriate.\nFor labels like \"Summary\", \"Modus Operandi\", \"Mitigations\", and \"Reference\", use bold formatting followed by a colon.\nEnsure that the text under each label is indented with a full-width tab (or at least 4 spaces) for visual clarity and to distinguish it from the labels.\nInsert horizontal rules (---) between major sections for separation.\nPreserve any visual formatting or layout that helps differentiate between sections (e.g., example entries, bullet structure, URL links).\nDo not convert tabs into flat text—maintain indentation explicitly using spaces or Markdown-friendly indentation styles.\nThe goal is to make the .md file look as close as possible to a professional briefing document with a clear visual hierarchy.\nStrict: Do not use \"&emsp;'\nDo not add \"```markdown\" in the output.\nDo not provide Reference links as hyperlinks, just provide the Reference link as it is."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1580,
+        800
+      ],
+      "id": "9c4bbc75-8a72-432c-905a-140959ef43a3",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        500
+      ],
+      "id": "5c7d0f38-1870-4810-990c-939e65ab9189",
+      "name": "Remove Duplicates1"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        320
+      ],
+      "id": "283c676c-9d6d-4824-8185-24694aed8d97",
+      "name": "Remove Duplicates2"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        160
+      ],
+      "id": "86d63238-3a91-4275-836a-d79656bfdc59",
+      "name": "Remove Duplicates3"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        0
+      ],
+      "id": "dac23f9e-41ed-42dd-a54b-ddd676060969",
+      "name": "Remove Duplicates4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1c07b4c0-09e6-4a3a-a7fd-19f6e2ce9529",
+              "leftValue": "={{ $json.link }}",
+              "rightValue": "ics",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            },
+            {
+              "id": "2bd8a95b-9953-4e1c-ac75-6e97a559dc35",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "Industrial Control Systems|Industrial Control System",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        500
+      ],
+      "id": "83ace743-4776-4a5a-9581-1288ba6ab634",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        0
+      ],
+      "id": "3e2c57f3-8d58-47b4-8fd4-dab12d71bbc9",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        160
+      ],
+      "id": "551f76c4-71b0-4e90-9eed-0736e830f70e",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        320
+      ],
+      "id": "3da1046a-fee0-403c-801f-44fa0afa006e",
+      "name": "Limit2"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        520
+      ],
+      "id": "e5ebbff2-549b-4c70-9ca5-aa5c01c7345f",
+      "name": "Limit4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1920,
+        100
+      ],
+      "id": "c90548c4-3479-4b6c-ad9b-3025e894090b",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        80
+      ],
+      "id": "32df0edc-8944-4114-864c-721fa91e6088",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        620
+      ],
+      "id": "223563bf-14a0-41a6-939b-023df5aab866",
+      "name": "Split Out7"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1960,
+        640
+      ],
+      "id": "d76a77f9-44b3-4f48-9339-44df473ce6a8",
+      "name": "Merge6"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        700
+      ],
+      "id": "ee5a7048-ae1e-461c-9f5d-f0a134d504f8",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        700
+      ],
+      "id": "362afeba-8649-43c9-8864-309bdc752396",
+      "name": "Limit5"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        880
+      ],
+      "id": "22b7f88d-e979-4a00-851c-f6e73c625caf",
+      "name": "Remove Duplicates5"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        880
+      ],
+      "id": "f9e78092-87bd-4be7-83bb-b5b72a0ce7b2",
+      "name": "Limit6"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const name = $json.name || \"\";\nconst nameWithoutExtension = name.split('.').slice(0, -1).join('.') || name;\n\nreturn {\n  json: {\n    file_name: nameWithoutExtension\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3180,
+        320
+      ],
+      "id": "1b28571a-77f6-472c-a7d5-178ee0d7530c",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/repos/YOUR_GITHUB_ORG/Threat-Intelligence-Hub/contents/Daily Briefing",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"User-Agent\": \"n8n\",\n  \"Authorization\": \"Bearer <GITHUB-TOKEN-HERE>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2080,
+        320
+      ],
+      "id": "a6ad48d9-0848-4fa6-8c9b-7169b35d8f5b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/YOUR_GITHUB_ORG/Threat-Intelligence-Hub/contents/{{ $json.path }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"User-Agent\": \"n8n\",\n  \"Authorization\": \"Bearer <GITHUB-TOKEN-HERE>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2420,
+        320
+      ],
+      "id": "6ae07788-fe4d-47aa-a387-e8289bee47b8",
+      "name": "HTTP Request 1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/YOUR_GITHUB_ORG/Threat-Intelligence-Hub/contents/{{ $json.path }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"User-Agent\": \"n8n\",\n  \"Authorization\": \"Bearer <GITHUB-TOKEN-HERE>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2720,
+        320
+      ],
+      "id": "63e8a70a-a08b-4262-9170-5e1a49f9e542",
+      "name": "HTTP Request 2"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/YOUR_GITHUB_ORG/Threat-Intelligence-Hub/contents/{{ $json.path }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"User-Agent\": \"n8n\",\n  \"Authorization\": \"Bearer <GITHUB-TOKEN-HERE>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2860,
+        320
+      ],
+      "id": "799d853d-c5e3-45c2-8361-c4b56a7a092f",
+      "name": "HTTP Request 3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        2260,
+        320
+      ],
+      "id": "43d45458-c7ab-4fa1-9794-daa3c5b95c8b",
+      "name": "Remove Duplicates6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3180,
+        100
+      ],
+      "id": "2c58906d-29b2-4577-899d-7dd50a7be624",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "title",
+              "field2": "file_name"
+            }
+          ]
+        },
+        "joinMode": "keepEverything",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        3360,
+        120
+      ],
+      "id": "a0276052-0f98-4ee3-8698-fbdf8b6f433f",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.title }}",
+                    "rightValue": "={{ $json.file_name }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fa8c81ff-2ad0-44f3-96e5-04c1b0818453"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Duplicate Output"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b9961c8b-9dae-463e-bbc5-f8324a2a679c",
+                    "leftValue": "={{ $json.title }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Needed Output"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Already on Github"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3520,
+        120
+      ],
+      "id": "fe7c1f9d-f5a4-45d3-a141-86e186d1dc2f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "title",
+              "field2": "file_name"
+            }
+          ]
+        },
+        "joinMode": "keepEverything",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        3380,
+        660
+      ],
+      "id": "0e79d543-91c0-4e7d-b96a-489c10bdf677",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.title }}",
+                    "rightValue": "={{ $json.file_name }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fa8c81ff-2ad0-44f3-96e5-04c1b0818453"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Duplicate Output"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b9961c8b-9dae-463e-bbc5-f8324a2a679c",
+                    "leftValue": "={{ $json.title }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Needed Output"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Already on Github"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3540,
+        660
+      ],
+      "id": "3bd69046-4fb1-4020-a7b8-5b4a65f7d7ac",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3180,
+        640
+      ],
+      "id": "efda0788-2afb-4391-8446-134009241a10",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const name = $json.name || \"\";\nconst nameWithoutExtension = name.split('.').slice(0, -1).join('.') || name;\n\nreturn {\n  json: {\n    file_name: nameWithoutExtension\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3180,
+        840
+      ],
+      "id": "b9bfad26-349a-4a4f-835c-ffb2706de458",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/repos/YOUR_GITHUB_ORG/Threat-Intelligence-Hub/contents/Content Update",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"User-Agent\": \"n8n\",\n  \"Authorization\": \"Bearer <GITHUB-TOKEN-HERE>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2100,
+        840
+      ],
+      "id": "7bca6883-6c2c-4653-a5e0-39e01b12580c",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/YOUR_GITHUB_ORG/Threat-Intelligence-Hub/contents/{{ $json.path }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"User-Agent\": \"n8n\",\n  \"Authorization\": \"Bearer <GITHUB-TOKEN-HERE>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2420,
+        840
+      ],
+      "id": "764c348e-a989-4122-862a-966b56031379",
+      "name": "HTTP Request "
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/YOUR_GITHUB_ORG/Threat-Intelligence-Hub/contents/{{ $json.path }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"User-Agent\": \"n8n\",\n  \"Authorization\": \"Bearer <GITHUB-TOKEN-HERE>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2700,
+        840
+      ],
+      "id": "8bb39994-624b-41f8-a0bc-82328e4b4935",
+      "name": "HTTP Request 5"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/YOUR_GITHUB_ORG/Threat-Intelligence-Hub/contents/{{ $json.path }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"User-Agent\": \"n8n\",\n  \"Authorization\": \"Bearer <GITHUB-TOKEN-HERE>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2860,
+        840
+      ],
+      "id": "1cd2e555-de05-412f-934c-4a309f21ec3c",
+      "name": "HTTP Request 6"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        2260,
+        840
+      ],
+      "id": "7cf90649-c299-4942-853e-a86cc598009c",
+      "name": "Remove Duplicates7"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        840
+      ],
+      "id": "d7816f72-35a8-474f-9ed7-6ebc6e5e9945",
+      "name": "Limit3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2580,
+        320
+      ],
+      "id": "51c86320-6c0d-46cf-9556-6cdee3deec87",
+      "name": "Limit7"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.feedburner.com/TheHackersNews",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        0
+      ],
+      "id": "9394c212-6a93-4469-913d-38dcbe51d731",
+      "name": "TheHackersNews"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.feedburner.com/Unit42",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        160
+      ],
+      "id": "f083eccf-99bb-4929-9146-80a977d8c6cf",
+      "name": "Unit42"
+    },
+    {
+      "parameters": {
+        "url": "https://thedfirreport.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        320
+      ],
+      "id": "8f3abbce-bd7e-45e2-bf4b-99da46a0138a",
+      "name": "thedfirreport"
+    },
+    {
+      "parameters": {
+        "url": "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        500
+      ],
+      "id": "4f817a8a-f737-460e-8b0a-965ada320214",
+      "name": "cisa"
+    },
+    {
+      "parameters": {
+        "url": "https://specterops.io/blog/category/research/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        700
+      ],
+      "id": "8d1500a4-869d-4435-b29a-e2d357744eb1",
+      "name": "specterops"
+    },
+    {
+      "parameters": {
+        "url": "https://www.elastic.co/security-labs/rss/feed.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        880
+      ],
+      "id": "462a2e5e-3991-4254-ae57-3154f50622a8",
+      "name": "elastic"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "name",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        3000,
+        320
+      ],
+      "id": "7cca4637-4e9e-4246-bf40-df123a773d51",
+      "name": "Remove  Duplicates8"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "name",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        3020,
+        840
+      ],
+      "id": "e1594ac6-cbe7-4c67-b973-8ad040ad4c89",
+      "name": "Remove  Duplicates9"
+    },
+    {
+      "parameters": {
+        "url": "https://securelist.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        1080
+      ],
+      "id": "563f004e-4efa-459b-a82c-bc1f64f8a3f2",
+      "name": "securelist"
+    },
+    {
+      "parameters": {
+        "url": "https://blog.talosintelligence.com/rss/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        1260
+      ],
+      "id": "21e01121-6e13-4da8-a31b-b3537141c27e",
+      "name": "talosintelligence"
+    },
+    {
+      "parameters": {
+        "url": "https://offsec.blog/category/blog/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        1420
+      ],
+      "id": "e49a9364-be13-41a3-8a68-2ba76a0033af",
+      "name": "offsec"
+    },
+    {
+      "parameters": {
+        "url": "https://www.group-ib.com/feed/blogfeed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        1580
+      ],
+      "id": "cfd68ffe-bfb1-4eca-93b4-c09ced746a44",
+      "name": "group-ib"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        1080
+      ],
+      "id": "051d31ce-766b-47b3-b50a-970a88c87f24",
+      "name": "Remove Duplicates8"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        1260
+      ],
+      "id": "7ecd0675-2246-41c8-b0c2-f642356d5762",
+      "name": "Remove Duplicates9"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        1420
+      ],
+      "id": "08ee6b9a-f5a7-42a8-a0af-4d7ce479d4b9",
+      "name": "Remove Duplicates10"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        100,
+        1580
+      ],
+      "id": "0cd15a5f-5841-4f5b-bbb7-97512209ac30",
+      "name": "Remove Duplicates13"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1080
+      ],
+      "id": "2962dad5-d777-488a-b766-23e274489f54",
+      "name": "Limit8"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1260
+      ],
+      "id": "e43094a1-574e-4c25-a4fa-83eadb145575",
+      "name": "Limit9"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1420
+      ],
+      "id": "35fa9911-8fdf-4872-8eba-2e0d5e5e383c",
+      "name": "Limit10"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1580
+      ],
+      "id": "a340cc82-e57b-40b1-8a70-b9d85ca0b93c",
+      "name": "Limit13"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1100,
+        420
+      ],
+      "id": "02a61281-b90d-4684-aa4a-f35a70126529",
+      "name": "Merge4"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3760,
+        440
+      ],
+      "id": "d40eec4e-90e5-4322-967c-cca6467ff20b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "options": {
+          "fileName": "={{ $json.title }}.md"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3800,
+        120
+      ],
+      "id": "88f79adc-9275-4bff-940b-7b89309bc3c9",
+      "name": "Daily Briefing MD File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "Read the data in Prompt (User Message) and convert it into JSON format.\nNote: \n1. Do not add this \"```json\\n and \\n```\" in the output.\n2. Provide Key names in capital letters."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        3800,
+        300
+      ],
+      "id": "0976610b-e2cc-4386-a0cf-4da8b64eca2a",
+      "name": "AI Agent (JSON Converter)"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "YOUR_GITHUB_ORG",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "Threat-Intelligence-Hub",
+          "mode": "name"
+        },
+        "filePath": "=Daily Briefing/{{ $('Schedule Trigger1').item.json.Year }}/{{ $('Schedule Trigger1').item.json.Month }}/{{ $('Schedule Trigger1').item.json['Day of month'] }}/{{ $('Switch').item.json.title }}.md",
+        "binaryData": true,
+        "commitMessage": "=Daily Briefing for {{ $('Schedule Trigger1').item.json['Readable date'] }}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        4320,
+        120
+      ],
+      "id": "40869860-35e4-487c-91e7-7860d98c458c",
+      "name": "GitHub MD File",
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "YOUR_GITHUB_ORG",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "Threat-Intelligence-Hub",
+          "mode": "name"
+        },
+        "filePath": "=Daily Briefing/{{ $('Schedule Trigger1').item.json.Year }}/{{ $('Schedule Trigger1').item.json.Month }}/{{ $('Schedule Trigger1').item.json['Day of month'] }}/{{ $('Switch').item.json.title }}.json",
+        "binaryData": true,
+        "commitMessage": "=Daily Briefing for {{ $('Schedule Trigger1').item.json['Readable date'] }}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        4320,
+        300
+      ],
+      "id": "fa91a48a-c466-44e7-b603-13c96cece51b",
+      "name": "GitHub JSON File",
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "options": {
+          "fileName": "={{ $('Switch').item.json.title }}.json"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        4140,
+        300
+      ],
+      "id": "433a7927-fbfa-43c9-a517-d16c26d3d291",
+      "name": "Daily Briefing JSON File"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "options": {
+          "fileName": "={{ $json.title }}.md"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3800,
+        660
+      ],
+      "id": "ba58cf8d-6459-4dc9-9b5e-d17f0f29216c",
+      "name": "Content Update MD File"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "YOUR_GITHUB_ORG",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "Threat-Intelligence-Hub",
+          "mode": "name"
+        },
+        "filePath": "=Content Update/{{ $('Schedule Trigger1').item.json.Year }}/{{ $('Schedule Trigger1').item.json.Month }}/{{ $('Schedule Trigger1').item.json['Day of month'] }}/{{ $('Switch1').item.json.title }}.md",
+        "binaryData": true,
+        "commitMessage": "=Content Update for {{ $('Schedule Trigger1').item.json['Readable date'] }}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        4320,
+        660
+      ],
+      "id": "b794578a-7cdb-4aa3-85c3-1d2d16c992c0",
+      "name": "GitHub1 MD File 1",
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3760,
+        960
+      ],
+      "id": "b42b4290-4131-420d-88d7-18ca5ff24176",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "Read the data in Prompt (User Message) and convert it into JSON format.\nNote: \n1. Do not add this \"```json\\n and \\n```\" in the output.\n2. Provide Key names in capital letters."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        3800,
+        820
+      ],
+      "id": "db0fb092-d1cf-4392-b394-4ac98d5f6709",
+      "name": "AI Agent (JSON Converter)1"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "YOUR_GITHUB_ORG",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "Threat-Intelligence-Hub",
+          "mode": "name"
+        },
+        "filePath": "=Content Update/{{ $('Schedule Trigger1').item.json.Year }}/{{ $('Schedule Trigger1').item.json.Month }}/{{ $('Schedule Trigger1').item.json['Day of month'] }}/{{ $('Switch1').item.json.title }}.json",
+        "binaryData": true,
+        "commitMessage": "=Content Update for {{ $('Schedule Trigger1').item.json['Readable date'] }}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        4320,
+        820
+      ],
+      "id": "7767a090-6ffa-4cf0-839f-6183d8798280",
+      "name": "GitHub JSON File1",
+      "credentials": {
+        "githubApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "options": {
+          "fileName": "={{ $('Switch1').item.json.title }}.json"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        4140,
+        820
+      ],
+      "id": "2fedc605-1de9-4612-907d-63266bc459b5",
+      "name": "Content Update JSON File"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fef8f2af-e73c-470a-90fc-53ca6879df9a",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "/",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        420
+      ],
+      "id": "ae4f06f7-b89b-4a33-a97c-84e805d663d2",
+      "name": "If1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Date & Time1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time1": {
+      "main": [
+        [
+          {
+            "node": "elastic",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TheHackersNews",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Unit42",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "thedfirreport",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "cisa",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "specterops",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "securelist",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "talosintelligence",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "offsec",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "group-ib",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates2": {
+      "main": [
+        [
+          {
+            "node": "Limit2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates3": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates4": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Limit4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Limit2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Limit4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out7": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge6": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Limit5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit5": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates5": {
+      "main": [
+        [
+          {
+            "node": "Limit6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit6": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request 1": {
+      "main": [
+        [
+          {
+            "node": "Limit7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request 2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request 3": {
+      "main": [
+        [
+          {
+            "node": "Remove  Duplicates8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates6": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Daily Briefing MD File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent (JSON Converter)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request ": {
+      "main": [
+        [
+          {
+            "node": "Limit3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request 5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request 6": {
+      "main": [
+        [
+          {
+            "node": "Remove  Duplicates9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates7": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Content Update MD File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent (JSON Converter)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit7": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TheHackersNews": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unit42": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "thedfirreport": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cisa": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "specterops": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "elastic": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove  Duplicates8": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove  Duplicates9": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "securelist": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "talosintelligence": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "offsec": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "group-ib": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates8": {
+      "main": [
+        [
+          {
+            "node": "Limit8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates9": {
+      "main": [
+        [
+          {
+            "node": "Limit9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates10": {
+      "main": [
+        [
+          {
+            "node": "Limit10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates13": {
+      "main": [
+        [
+          {
+            "node": "Limit13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit8": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Limit9": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "Limit10": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 8
+          }
+        ]
+      ]
+    },
+    "Limit13": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent (JSON Converter)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Briefing MD File": {
+      "main": [
+        [
+          {
+            "node": "GitHub MD File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent (JSON Converter)": {
+      "main": [
+        [
+          {
+            "node": "Daily Briefing JSON File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Briefing JSON File": {
+      "main": [
+        [
+          {
+            "node": "GitHub JSON File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Update MD File": {
+      "main": [
+        [
+          {
+            "node": "GitHub1 MD File 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent (JSON Converter)1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent (JSON Converter)1": {
+      "main": [
+        [
+          {
+            "node": "Content Update JSON File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Update JSON File": {
+      "main": [
+        [
+          {
+            "node": "GitHub JSON File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Out7",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
